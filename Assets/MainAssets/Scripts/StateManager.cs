@@ -14,11 +14,8 @@ public class StateManager : MonoBehaviour
 
     void Start()
     {
-        
         ChangeStateToWelcome();
-        // ChangeStateToLandingPage();
-        // ChangeStateToTrain();
-        //ChangeStateToRecordGripWidth();
+        //ChangeStateToTrain();
     }
 
     void Update()
