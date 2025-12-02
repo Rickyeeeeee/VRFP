@@ -8,6 +8,9 @@ public class TrainCoroutineManager : MonoBehaviour
 {
     public static TrainCoroutineManager Instance { get; private set; }
 
+    private static readonly Color CORRECT_COLOR = new Color(0.28f, 0.5f, 0.28f, 1f);
+    private static readonly Color WRONG_COLOR = new Color(0.5f, 0.2f, 0.2f, 1f);
+
     void Awake()
     {
         Instance = this;
@@ -20,7 +23,7 @@ public class TrainCoroutineManager : MonoBehaviour
 
     void Update()
     {
-
+        
     }
 
     // Train Coroutines
@@ -29,6 +32,7 @@ public class TrainCoroutineManager : MonoBehaviour
     private Coroutine trainCoroutine3;  // tilt
     private Coroutine trainCoroutine4;  // emg
     private Coroutine trainCoroutine5;  // press
+    private Coroutine trainCoroutine5_5;  // temporary: press based on rotation (until pressure sensor available)
 
     public void StartAllTrainCoroutines()
     {
@@ -37,16 +41,26 @@ public class TrainCoroutineManager : MonoBehaviour
         trainCoroutine3 = StartCoroutine(TrainCoroutine3());
         trainCoroutine4 = StartCoroutine(TrainCoroutine4());
         trainCoroutine5 = StartCoroutine(TrainCoroutine5());
+        trainCoroutine5_5 = StartCoroutine(TrainCoroutine5_5());
     }
 
     private IEnumerator TrainCoroutine1()
     {
+        float startingZRotation = 0f;
+        bool startingZCaptured = false;
+        
         while (true)
         {
             Vector3 currentPosition = SharedInfoManager.Instance.GetBarCurrentPosition();
             Vector3 currentRotation = SharedInfoManager.Instance.GetBarCurrentRotation();
             Vector3 initialPosition = SharedInfoManager.Instance.GetBarUpperRefPosition();
             Vector3 initialRotation = SharedInfoManager.Instance.GetBarRefRotation();
+
+            if (!startingZCaptured)
+            {
+                startingZRotation = currentRotation.z;
+                startingZCaptured = true;
+            }
 
             Vector3 positionDifference = Quaternion.Inverse(Quaternion.Euler(initialRotation)) * (currentPosition - initialPosition);
             Vector3 rotationDifference = currentRotation - initialRotation;
@@ -58,6 +72,48 @@ public class TrainCoroutineManager : MonoBehaviour
 
             UIManager.Instance.bar.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationDifference.y);
             UIManager.Instance.redSpot.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationDifference.y);
+            Debug.Log("positionDifference: " + positionDifference);
+            Debug.Log("rotationDifference: " + rotationDifference);
+            bool isAllCorrect = true;
+            
+            float positionThreshold = 0.01f; 
+            bool isBarCenteredX = Mathf.Abs(positionDifference.x) < positionThreshold;
+            bool isBarCenteredZ = Mathf.Abs(positionDifference.z) < positionThreshold;
+            bool isBarCentered = isBarCenteredX && isBarCenteredZ;
+            if (!isBarCentered) isAllCorrect = false;
+            
+            float zRotationThreshold = 30.0f;
+            float currentZ = currentRotation.z;
+            float initialZ = startingZRotation;
+            
+            currentZ = currentZ % 360f;
+            if (currentZ < 0f) currentZ += 360f;
+            initialZ = initialZ % 360f;
+            if (initialZ < 0f) initialZ += 360f;
+            
+            // float zRotationDiff = currentZ - initialZ;
+            // if (zRotationDiff > 180f) zRotationDiff -= 360f;
+            // if (zRotationDiff < -180f) zRotationDiff += 360f;
+            
+            // bool isZRotationCorrect = Mathf.Abs(zRotationDiff) <= zRotationThreshold;
+            // if (!isZRotationCorrect) isAllCorrect = false;
+            
+            float xAngleThreshold = 5.0f;
+            bool isTiltCorrect = (360.0f - xAngleThreshold <= rotationDifference.x || rotationDifference.x <= xAngleThreshold);
+            if (!isTiltCorrect) isAllCorrect = false;
+            
+            float yRotationThreshold = 5.0f; 
+            float yRotationDiff = rotationDifference.y;
+            if (yRotationDiff > 180f) yRotationDiff -= 360f;
+            if (yRotationDiff < -180f) yRotationDiff += 360f;
+            bool isYRotationCorrect = Mathf.Abs(yRotationDiff) <= yRotationThreshold;
+            if (!isYRotationCorrect) isAllCorrect = false;
+            
+            if (UIManager.Instance.overallPanelBackground != null)
+            {
+                RawImage overallBgImage = UIManager.Instance.overallPanelBackground.GetComponent<RawImage>();
+                overallBgImage.color = isAllCorrect ? CORRECT_COLOR : WRONG_COLOR;
+            }
 
             yield return null;
         }
@@ -66,6 +122,7 @@ public class TrainCoroutineManager : MonoBehaviour
     private IEnumerator TrainCoroutine2()
     {
         bool isGoingDown;
+        int repCount = 0;
 
         isGoingDown = true;
         VisualizationManager.Instance.upperIndicator.SetActive(false);
@@ -80,7 +137,18 @@ public class TrainCoroutineManager : MonoBehaviour
 
             if (isSatisfied)
             {
+                bool wasGoingDown = isGoingDown;
                 isGoingDown = !isGoingDown;
+                
+                if (!wasGoingDown && isGoingDown)
+                {
+                    repCount++;
+                    if (UIManager.Instance.repCountText != null)
+                    {
+                        UIManager.Instance.repCountText.text = repCount.ToString();
+                    }
+                }
+                
                 if (isGoingDown)
                 {
                     VisualizationManager.Instance.upperIndicator.SetActive(false);
@@ -143,7 +211,7 @@ public class TrainCoroutineManager : MonoBehaviour
         while (true)
         {
             float emg = SharedInfoManager.Instance.GetEMGSignal();
-            float value = Mathf.Lerp(0.2f, 0.8f, emg);
+            float value = Mathf.Lerp(0.2f, 1.0f, emg);
             Color color = rawImage.color;
             color.a = value;
             rawImage.color = color;
@@ -154,35 +222,125 @@ public class TrainCoroutineManager : MonoBehaviour
 
     private IEnumerator TrainCoroutine5()
     {
+        
+        float wrongPositionThreshold = 0.6f; 
+        
         while (true)
         {
-            float pressSignalAtLowerPoint = SharedInfoManager.Instance.GetPressSignalAtLowerPoint();
-            float pressSignalAtHigherPoint = SharedInfoManager.Instance.GetPressSignalAtHigherPoint();
-
-            float sum = pressSignalAtLowerPoint + pressSignalAtHigherPoint;
+            // Get left hand signals
+            float leftLower = SharedInfoManager.Instance.GetLeftPressSignalAtLowerPoint();
+            float leftHigher = SharedInfoManager.Instance.GetLeftPressSignalAtHigherPoint();
+            float leftSum = leftLower + leftHigher;
             
-            if (pressSignalAtLowerPoint < 0.0f || pressSignalAtHigherPoint < 0.0f || sum <= 0.0f)
-            {
-                UIManager.Instance.pressSignalAtLowerPoint.GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, 0.0f);
-                UIManager.Instance.pressSignalAtLowerPointText.GetComponent<TextMeshProUGUI>().text = "";
-                UIManager.Instance.pressSignalAtHigherPoint.GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, 0.0f);
-                UIManager.Instance.pressSignalAtHigherPointText.GetComponent<TextMeshProUGUI>().text = "";
-                yield return null;
-                continue;
+            // Get right hand signals
+            float rightLower = SharedInfoManager.Instance.GetRightPressSignalAtLowerPoint();
+            float rightHigher = SharedInfoManager.Instance.GetRightPressSignalAtHigherPoint();
+            float rightSum = rightLower + rightHigher;
+
+            bool isLeftWrong = false;
+            bool isRightWrong = false;
+
+            float leftHigherPercentage = leftHigher / leftSum;
+            isLeftWrong = leftHigherPercentage >= wrongPositionThreshold;
+            UIManager.Instance.leftHandWrongImage.SetActive(isLeftWrong);
+            //Left hand
+            RawImage leftHandCorrectImage = UIManager.Instance.leftHandCorrectImage.GetComponent<RawImage>();
+            Color leftHandCorrectColor = leftHandCorrectImage.color;
+            if (isLeftWrong)
+            {    
+                leftHandCorrectColor.a = 0.6f;    
             }
+            else{
+                leftHandCorrectColor.a = 1.0f;
+            }
+            leftHandCorrectImage.color = leftHandCorrectColor;
+            
+            
+            float rightHigherPercentage = rightHigher / rightSum;
+            isRightWrong = rightHigherPercentage >= wrongPositionThreshold;
+            UIManager.Instance.rightHandWrongImage.SetActive(isRightWrong);
+            //Right hand
+            RawImage rightHandCorrectImage = UIManager.Instance.rightHandCorrectImage.GetComponent<RawImage>();
+            Color rightHandCorrectColor = rightHandCorrectImage.color;
+            if (isRightWrong)
+            {
+                rightHandCorrectColor.a = 0.6f;
+            }
+            else{
+                rightHandCorrectColor.a = 1.0f;
+            }
+            rightHandCorrectImage.color = rightHandCorrectColor;
+            if (UIManager.Instance.leftHandPanelBackground != null)
+            {
+                RawImage leftBgImage = UIManager.Instance.leftHandPanelBackground.GetComponent<RawImage>();
+                leftBgImage.color = isLeftWrong ? WRONG_COLOR : CORRECT_COLOR;
+            }
+            if (UIManager.Instance.rightHandPanelBackground != null)
+            {
+                RawImage rightBgImage = UIManager.Instance.rightHandPanelBackground.GetComponent<RawImage>();
+                rightBgImage.color = isRightWrong ? WRONG_COLOR : CORRECT_COLOR;
+            }
+            
+            yield return null;
+        }
+    }
 
-            int percentageAtLowerPoint = Mathf.RoundToInt(pressSignalAtLowerPoint / sum * 100f);
-            int percentageAtHigherPoint = 100 - percentageAtLowerPoint;
+    private IEnumerator TrainCoroutine5_5()
+    {
+        float rotationThreshold = 30.0f;
+        float startingZRotation = SharedInfoManager.Instance.GetBarCurrentRotation().z;
+        bool startingZCaptured = false;
+        
+        while (true)
+        {
+            
+            Vector3 currentRotation = SharedInfoManager.Instance.GetBarCurrentRotation();
+            
+            if (!startingZCaptured)
+            {
+                startingZRotation = currentRotation.z;
+                startingZCaptured = true;
+            }
+            
+            float currentZ = currentRotation.z;
+            float initialZ = startingZRotation;
+            Debug.Log(currentRotation);
+            currentZ = currentZ % 360f;
+            if (currentZ < 0f) currentZ += 360f;
+            initialZ = initialZ % 360f;
+            if (initialZ < 0f) initialZ += 360f;
+            
+            float zRotationDiff = currentZ - initialZ;
+            if (zRotationDiff > 180f) zRotationDiff -= 360f;
+            if (zRotationDiff < -180f) zRotationDiff += 360f;
 
-            float scale = 10.0f;
-            float radiusAtLowerPoint = percentageAtLowerPoint / scale;
-            float radiusAtHigherPoint = percentageAtHigherPoint / scale;
-
-            UIManager.Instance.pressSignalAtLowerPoint.GetComponent<RectTransform>().sizeDelta = new Vector2(radiusAtLowerPoint, radiusAtLowerPoint);
-            UIManager.Instance.pressSignalAtLowerPointText.GetComponent<TextMeshProUGUI>().text = percentageAtLowerPoint.ToString() + "%";
-            UIManager.Instance.pressSignalAtHigherPoint.GetComponent<RectTransform>().sizeDelta = new Vector2(radiusAtHigherPoint, radiusAtHigherPoint);
-            UIManager.Instance.pressSignalAtHigherPointText.GetComponent<TextMeshProUGUI>().text = percentageAtHigherPoint.ToString() + "%";
-
+            bool isWrong = Mathf.Abs(zRotationDiff) > rotationThreshold;
+            bool isLeftWrong = isWrong;
+            bool isRightWrong = isWrong;
+        
+            UIManager.Instance.leftHandWrongImage.SetActive(isLeftWrong);
+            RawImage leftHandCorrectImage = UIManager.Instance.leftHandCorrectImage.GetComponent<RawImage>();
+            Color leftHandCorrectColor = leftHandCorrectImage.color;
+            leftHandCorrectColor.a = isLeftWrong ? 0.6f : 1.0f;
+            leftHandCorrectImage.color = leftHandCorrectColor;
+            
+            UIManager.Instance.rightHandWrongImage.SetActive(isRightWrong);
+            RawImage rightHandCorrectImage = UIManager.Instance.rightHandCorrectImage.GetComponent<RawImage>();
+            Color rightHandCorrectColor = rightHandCorrectImage.color;
+            rightHandCorrectColor.a = isRightWrong ? 0.6f : 1.0f;
+            rightHandCorrectImage.color = rightHandCorrectColor;
+        
+            if (UIManager.Instance.leftHandPanelBackground != null)
+            {
+                RawImage leftBgImage = UIManager.Instance.leftHandPanelBackground.GetComponent<RawImage>();
+                leftBgImage.color = isLeftWrong ? WRONG_COLOR : CORRECT_COLOR;
+            }
+            if (UIManager.Instance.rightHandPanelBackground != null)
+            {
+                RawImage rightBgImage = UIManager.Instance.rightHandPanelBackground.GetComponent<RawImage>();
+                rightBgImage.color = isRightWrong ? WRONG_COLOR : CORRECT_COLOR;
+            }
+            
             yield return null;
         }
     }
@@ -193,6 +351,8 @@ public class TrainCoroutineManager : MonoBehaviour
         StopTrainCoroutine(trainCoroutine2);
         StopTrainCoroutine(trainCoroutine3);
         StopTrainCoroutine(trainCoroutine4);
+        StopTrainCoroutine(trainCoroutine5);
+        StopTrainCoroutine(trainCoroutine5_5);
     }
 
     private void StopTrainCoroutine(Coroutine trainCoroutine)

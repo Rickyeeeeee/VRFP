@@ -65,12 +65,18 @@ public class UIManager : MonoBehaviour
     public GameObject bar;
     public GameObject redSpot;
 
+    // Train Couroutine 2
+    public TMP_Text repCountText;
+
     // Train Couroutine 4
     public GameObject chestMuscle;
 
-    // Train Couroutine 5
-    public GameObject pressSignalAtLowerPoint;
-    public GameObject pressSignalAtLowerPointText;
-    public GameObject pressSignalAtHigherPoint;
-    public GameObject pressSignalAtHigherPointText;
+    // Train Couroutine 5 
+    public GameObject leftHandPanelBackground;
+    public GameObject rightHandPanelBackground;
+    public GameObject overallPanelBackground;
+    public GameObject leftHandWrongImage;   
+    public GameObject leftHandCorrectImage; 
+    public GameObject rightHandWrongImage;  
+    public GameObject rightHandCorrectImage; 
 }

@@ -11,14 +11,13 @@ public class SharedInfoManager : MonoBehaviour
 
     void Start()
     {
-        barUpperRefPosition = new Vector3(-2.0f, 1.26f, -0.4f) + new Vector3(0.0f, 0.15f, 0.0f);
-        barLowerRefPosition = new Vector3(-2.0f, 1.26f, -0.4f) + new Vector3(0.0f, -0.45f, 0.0f);
+        barUpperRefPosition = new Vector3(0.0f, 1.26f, 0.5f) + new Vector3(0.0f, 0.15f, 0.0f);
+        barLowerRefPosition = new Vector3(0.0f, 1.26f, 0.5f) + new Vector3(0.0f, -0.45f, 0.0f);
         barRefRotation = new Vector3(0.0f, 90.0f, 0.0f);
     }
 
     void Update()
     {
-
     }
 
     // Triggers
@@ -71,4 +70,19 @@ public class SharedInfoManager : MonoBehaviour
     public void SetPressSignalAtLowerPoint(float value) => pressSignalAtLowerPoint = value;
     public float GetPressSignalAtHigherPoint() => pressSignalAtHigherPoint;
     public void SetPressSignalAtHigherPoint(float value) => pressSignalAtHigherPoint = value;
+
+    // Train Couroutine 5 - Left and Right separated
+    [SerializeField] private float leftPressSignalAtLowerPoint;
+    [SerializeField] private float leftPressSignalAtHigherPoint;
+    [SerializeField] private float rightPressSignalAtLowerPoint;
+    [SerializeField] private float rightPressSignalAtHigherPoint;
+
+    public float GetLeftPressSignalAtLowerPoint() => leftPressSignalAtLowerPoint;
+    public void SetLeftPressSignalAtLowerPoint(float value) => leftPressSignalAtLowerPoint = value;
+    public float GetLeftPressSignalAtHigherPoint() => leftPressSignalAtHigherPoint;
+    public void SetLeftPressSignalAtHigherPoint(float value) => leftPressSignalAtHigherPoint = value;
+    public float GetRightPressSignalAtLowerPoint() => rightPressSignalAtLowerPoint;
+    public void SetRightPressSignalAtLowerPoint(float value) => rightPressSignalAtLowerPoint = value;
+    public float GetRightPressSignalAtHigherPoint() => rightPressSignalAtHigherPoint;
+    public void SetRightPressSignalAtHigherPoint(float value) => rightPressSignalAtHigherPoint = value;
 }

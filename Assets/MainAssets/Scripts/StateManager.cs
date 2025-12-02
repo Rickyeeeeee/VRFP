@@ -14,8 +14,9 @@ public class StateManager : MonoBehaviour
 
     void Start()
     {
+        // ChangeStateToWelcome();
+        // ChangeStateToTrain();
         ChangeStateToWelcome();
-        //ChangeStateToTrain();
     }
 
     void Update()
@@ -139,7 +140,7 @@ public class StateManager : MonoBehaviour
                 break;
 
             case State.Train:
-                //UIManager.Instance.trainPage.SetActive(true);
+                UIManager.Instance.trainPage.SetActive(true);
                 VisualizationManager.Instance.barPositionIndicators.SetActive(true);
                 VisualizationManager.Instance.barRotationIndicators.SetActive(true);
                 TrainCoroutineManager.Instance.StartAllTrainCoroutines();
