@@ -27,7 +27,7 @@ public class IKManager : MonoBehaviour
         {
             initialRightHandY = rightHandTarget.position.y;
         }
-        Debug.LogWarning("[IKManager] initalBarY: " + initialBarY + " initialLeftHandY: " + initialLeftHandY + " initialRightHandY: " + initialRightHandY);
+        // Debug.LogWarning("[IKManager] initalBarY: " + initialBarY + " initialLeftHandY: " + initialLeftHandY + " initialRightHandY: " + initialRightHandY);
     }
 
     // Update is called once per frame

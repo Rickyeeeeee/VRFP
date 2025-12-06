@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Whisper;
 using UnityEngine.UI; 
@@ -11,16 +12,29 @@ public class VoiceManager : MonoBehaviour
     // public VoiceCommands voiceCommands;
 
     [Header("Recording Settings")]
-    [Tooltip("Recording duration (s)")]
-    public float recordingDuration = 2f;
-    [Tooltip("Volume threshold")]
-    public float volumeThreshold = 0.0001f;
-    [Tooltip("Checking Interval (s)")]
-    public float checkInterval = 0.5f;
+    // [Tooltip("Recording duration (s)")]
+    // public float recordingDuration = 2f;
+    // [Tooltip("Volume threshold")]
+    // public float volumeThreshold = 0.0005f;
+    // [Tooltip("Checking Interval (s)")]
+    // public float checkInterval = 0.1f;
+    [Tooltip("Sensitivity")]
+    public float vadThreshold = 0.01f;  // Higher -> less sensitive
+    [Tooltip("Max recording length (s)")]
+    public int maxRecordingLength = 2; 
+    [Tooltip("How long silence to wait before stopping recording (s)")]
+    public float silenceDurationToStop = 0.5f;
     
-    private AudioClip _clip;
     private string _micDevice;
     private bool _isProcessing = false;
+    private bool _isRecording = false;
+    
+    // VAD setting
+    private AudioClip _clip;
+    private int _sampleRate = 16000;
+    private int _lastSamplePos = 0;
+    private float _silenceTimer = 0f;
+    private List<float> _accumulatedSamples = new List<float>();
 
     void Start()
     {
@@ -28,7 +42,7 @@ public class VoiceManager : MonoBehaviour
         {
             _micDevice = Microphone.devices[0];
             Debug.LogWarning("[INFO] Microphone device found: " + _micDevice);
-            StartCoroutine(SmartListening());
+            StartMicrophone();
         }
         else
         {
@@ -36,62 +50,109 @@ public class VoiceManager : MonoBehaviour
         }
     }
 
-    IEnumerator SmartListening()
+    void StartMicrophone()
     {
-        while (true)
+        _clip = Microphone.Start(_micDevice, true, maxRecordingLength, _sampleRate);
+        _lastSamplePos = 0;
+    }
+
+    void Update()
+    {
+        if (_isProcessing || _micDevice == null) return;
+
+        int currentPos = Microphone.GetPosition(_micDevice);
+        if (currentPos < 0 || currentPos == _lastSamplePos) return;
+
+        // Calculate how many samples to read
+        int samplesToRead = currentPos - _lastSamplePos;
+        if (samplesToRead < 0) samplesToRead += _clip.samples;
+
+        float[] waveData = new float[samplesToRead];
+
+        if (_lastSamplePos + samplesToRead <= _clip.samples)
         {
-            if (!_isProcessing)
+            _clip.GetData(waveData, _lastSamplePos);
+        }
+        else
+        {
+            int endPart = _clip.samples - _lastSamplePos;
+            float[] part1 = new float[endPart];
+            float[] part2 = new float[samplesToRead - endPart];
+            _clip.GetData(part1, _lastSamplePos);
+            _clip.GetData(part2, 0);
+            System.Array.Copy(part1, 0, waveData, 0, endPart);
+            System.Array.Copy(part2, 0, waveData, endPart, part2.Length);
+        }
+
+        _lastSamplePos = currentPos;
+
+        float maxVolume = 0f;
+        foreach (var s in waveData)
+        {
+            if (Mathf.Abs(s) > maxVolume) maxVolume = Mathf.Abs(s);
+        }
+
+        // VAD logic
+        if (maxVolume > vadThreshold)
+        {
+            // Voice detected
+            if (!_isRecording)
             {
-                _clip = Microphone.Start(_micDevice, false, (int)recordingDuration + 1, 16000);
-             
-                yield return new WaitForSeconds(recordingDuration);
-
-                float volume = GetAverageVolume();
-                // Debug.LogWarning($"[INFO] Average Volume: {volume}");
-                
-                if (volume > volumeThreshold)
-                {
-                    Debug.LogWarning($"[INFO] Voice detected! Volume: {volume}");
-                    StopAndTranscribe();
-                }
-                else
-                {
-                    Microphone.End(_micDevice);
-                }
+                // Debug.Log("[INFO] Voice started...");
+                _isRecording = true;
+                _accumulatedSamples.Clear();
             }
-            
-            yield return new WaitForSeconds(checkInterval);
+            _silenceTimer = 0f; // Reset silence timer
+        }
+        else if (_isRecording)
+        {
+            // Currently recording, but silence detected
+            _silenceTimer += Time.deltaTime; // Note: This is approximate based on frame rate
+            // Better: _silenceTimer += (float)samplesToRead / _sampleRate;
+        }
+
+        // If we are recording, accumulate samples
+        if (_isRecording)
+        {
+            _accumulatedSamples.AddRange(waveData);
+
+            // Check if we should stop
+            // 1. Silence for too long
+            // 2. Buffer too big (safety cap)
+            if (_silenceTimer > silenceDurationToStop || _accumulatedSamples.Count > _sampleRate * maxRecordingLength)
+            {
+                // Debug.Log("[INFO] Voice ended. Transcribing...");
+                StopAndTranscribe();
+            }
         }
     }
 
-    float GetAverageVolume()
-    {
-        float[] data = new float[_clip.samples];
-        _clip.GetData(data, 0);
-        
-        float sum = 0;
-        for (int i = 0; i < data.Length; i++)
-        {
-            sum += Mathf.Abs(data[i]);
-        }
-        
-        return sum / data.Length;
-    }
 
     async void StopAndTranscribe()
     {
-        if (_micDevice == null) return;
-
+        _isRecording = false;
         _isProcessing = true;
-        Microphone.End(_micDevice);
+        _silenceTimer = 0f;
 
-        var res = await whisper.GetTextAsync(_clip);
-        string result = res.Result;
-        if(outputText) outputText.text = result;
-        
-        Debug.LogWarning("[INFO] Detection:" + result);
+        // Create a temporary clip from accumulated data
+        if (_accumulatedSamples.Count > 0)
+        {
+            float[] finalData = _accumulatedSamples.ToArray();
+            AudioClip clipToTranscribe = AudioClip.Create("TempVoice", finalData.Length, 1, _sampleRate, false);
+            clipToTranscribe.SetData(finalData, 0);
 
-        ProcessCommand(result);
+            var res = await whisper.GetTextAsync(clipToTranscribe);
+            string result = res.Result;
+            if(outputText) outputText.text = result;
+            
+            Debug.LogWarning("[INFO] Detection:" + result);
+            ProcessCommand(result);
+            
+            // Clean up
+            Destroy(clipToTranscribe);
+        }
+
+        _accumulatedSamples.Clear();
         _isProcessing = false;
     }
 
@@ -102,7 +163,7 @@ public class VoiceManager : MonoBehaviour
 
         if (text.Contains("ok ricky") || text.Contains("okay ricky") || text.Contains("ok, ricky") || text.Contains("okay, ricky"))
         {
-            Debug.LogWarning("[INFO] Command: OK Ricky");
+            // Debug.LogWarning("[INFO] Command: OK Ricky");
             // voiceCommands.ChangeCubeColor();
             if (SharedInfoManager.Instance != null)
             {
