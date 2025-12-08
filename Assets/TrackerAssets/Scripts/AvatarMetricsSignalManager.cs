@@ -70,54 +70,60 @@ public class AvatarMetricsSignalManager : MonoBehaviour
         bool isBothHandsColliding = isLeftHandColliding && isRightHandColliding;
         bool isPositionCorrect = CheckIsCorrect();
 
-        if (isBothHandsColliding && isPositionCorrect)
+        // Debug.Log($"Is position correct: {isPositionCorrect}");
+        if (isPositionCorrect)
         {
-            collisionTimer += Time.deltaTime;
-
-            if (collisionTimer >= requiredCollisionTime)
-            {
-                if (!wasHandPositionCorrect)
-                {
-                    sharedInfoManager.SetIsHandPositionCorrect(true);
-                    wasHandPositionCorrect = true;
-                }
-
-                if (isHandPositionCorrectText != null && isHandPositionCorrectText.isActiveAndEnabled)
-                {
-                    isHandPositionCorrectText.text = $"Is Hand Correct: True (Timer: {collisionTimer:F2}s)";
-                }
-            }
-            else
-            {
-                if (isHandPositionCorrectText != null && isHandPositionCorrectText.isActiveAndEnabled)
-                {
-                    isHandPositionCorrectText.text = $"Is Hand Correct: Counting... ({collisionTimer:F2}s / {requiredCollisionTime:F2}s)";
-                }
-            }
+            sharedInfoManager.SetIsHandPositionCorrect(true);
         }
-        else
-        {
-            if (collisionTimer > 0f || wasHandPositionCorrect)
-            {
-                collisionTimer = 0f;
-                wasHandPositionCorrect = false;
-                sharedInfoManager.SetIsHandPositionCorrect(false);
-            }
 
-            if (isHandPositionCorrectText != null && isHandPositionCorrectText.isActiveAndEnabled)
-            {
-                if (!isBothHandsColliding)
-                {
-                    string handStatus = $"L:{(isLeftHandColliding ? "✓" : "✗")} R:{(isRightHandColliding ? "✓" : "✗")}";
-                    isHandPositionCorrectText.text = $"Is Hand Correct: False (Need Both Hands on Bar) [{handStatus}]";
-                }
-                else
-                {
-                    string handStatus = $"L:{(isLeftHandColliding ? "✓" : "✗")} R:{(isRightHandColliding ? "✓" : "✗")}";
-                    isHandPositionCorrectText.text = $"Is Hand Correct: False (Position Incorrect) [{handStatus}]";
-                }
-            }
-        }
+        // if (isBothHandsColliding && isPositionCorrect)
+        // {
+        //     collisionTimer += Time.deltaTime;
+
+        //     if (collisionTimer >= requiredCollisionTime)
+        //     {
+        //         if (!wasHandPositionCorrect)
+        //         {
+        //             sharedInfoManager.SetIsHandPositionCorrect(true);
+        //             wasHandPositionCorrect = true;
+        //         }
+
+        //         if (isHandPositionCorrectText != null && isHandPositionCorrectText.isActiveAndEnabled)
+        //         {
+        //             isHandPositionCorrectText.text = $"Is Hand Correct: True (Timer: {collisionTimer:F2}s)";
+        //         }
+        //     }
+        //     else
+        //     {
+        //         if (isHandPositionCorrectText != null && isHandPositionCorrectText.isActiveAndEnabled)
+        //         {
+        //             isHandPositionCorrectText.text = $"Is Hand Correct: Counting... ({collisionTimer:F2}s / {requiredCollisionTime:F2}s)";
+        //         }
+        //     }
+        // }
+        // else
+        // {
+        //     if (collisionTimer > 0f || wasHandPositionCorrect)
+        //     {
+        //         collisionTimer = 0f;
+        //         wasHandPositionCorrect = false;
+        //         sharedInfoManager.SetIsHandPositionCorrect(false);
+        //     }
+
+        //     if (isHandPositionCorrectText != null && isHandPositionCorrectText.isActiveAndEnabled)
+        //     {
+        //         if (!isBothHandsColliding)
+        //         {
+        //             string handStatus = $"L:{(isLeftHandColliding ? "✓" : "✗")} R:{(isRightHandColliding ? "✓" : "✗")}";
+        //             isHandPositionCorrectText.text = $"Is Hand Correct: False (Need Both Hands on Bar) [{handStatus}]";
+        //         }
+        //         else
+        //         {
+        //             string handStatus = $"L:{(isLeftHandColliding ? "✓" : "✗")} R:{(isRightHandColliding ? "✓" : "✗")}";
+        //             isHandPositionCorrectText.text = $"Is Hand Correct: False (Position Incorrect) [{handStatus}]";
+        //         }
+        //     }
+        // }
     }
 
     void Start()

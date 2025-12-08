@@ -16,7 +16,9 @@ public class StateManager : MonoBehaviour
     {
         // ChangeStateToWelcome();
         // ChangeStateToTrain();
-        ChangeStateToWelcome();
+        // ChangeStateToWelcome();
+        // ChangeStateToRecordGripWidth();
+        ChangeStateToLieDown();
     }
 
     void Update()
@@ -120,6 +122,7 @@ public class StateManager : MonoBehaviour
                 checkChangeStateCoroutine = StartCoroutine(
                     NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsOkayRickyDetected(), State.DetectHands)
                 );
+                CameraManager.Instance.TeleportToTarget();
                 break;
 
             case State.DetectHands:
@@ -144,6 +147,7 @@ public class StateManager : MonoBehaviour
                 VisualizationManager.Instance.barPositionIndicators.SetActive(true);
                 VisualizationManager.Instance.barRotationIndicators.SetActive(true);
                 TrainCoroutineManager.Instance.StartAllTrainCoroutines();
+                CameraManager.Instance.TeleportToTarget();
                 break;
 
             default:
