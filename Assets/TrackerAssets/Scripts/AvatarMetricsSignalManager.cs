@@ -73,7 +73,8 @@ public class AvatarMetricsSignalManager : MonoBehaviour
         // Debug.Log($"Is position correct: {isPositionCorrect}");
         if (isPositionCorrect)
         {
-            sharedInfoManager.SetIsHandPositionCorrect(true);
+            // sharedInfoManager.SetIsHandPositionCorrect(true);
+            SharedInfoManager.Instance.SetIsRecordGripWidthReady(true);
         }
 
         // if (isBothHandsColliding && isPositionCorrect)

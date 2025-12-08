@@ -183,7 +183,7 @@ public class TrainCoroutineManager : MonoBehaviour
             }
             else
             {
-                if (rotationDifference.x < 180.0f)
+                if (rotationDifference.x > 180.0f)
                 {
                     VisualizationManager.Instance.leftIndicator.SetActive(false);
                     VisualizationManager.Instance.rightIndicator.SetActive(true);

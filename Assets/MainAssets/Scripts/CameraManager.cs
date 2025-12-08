@@ -26,24 +26,33 @@ public class CameraManager : MonoBehaviour
     /// <summary>
     /// Teleports VR camera to a world position & rotation.
     /// </summary>
-    public void TeleportCamera(Vector3 targetPosition, Quaternion targetRotation)
+public void TeleportCamera(Transform target)
+{
+    if (!xrOrigin || !vrCamera)
     {
-        if (!xrOrigin || !vrCamera)
-        {
-            Debug.LogError("CameraManager: Missing XR Origin or VR Camera reference.");
-            return;
-        }
-
-        // Current HMD pos
-        Vector3 camPos = vrCamera.transform.position;
-
-        // Compute the head offset inside the rig
-        Vector3 offset = camPos - xrOrigin.transform.position;
-
-        // Move XR Origin so HMD ends at target
-        xrOrigin.transform.position = targetPosition;
-        xrOrigin.transform.rotation = targetRotation;
+        Debug.LogError("CameraManager: Missing XR Origin or VR Camera reference.");
+        return;
     }
+
+    // --- Step 1: camera's local pose inside XR Origin ---
+    Vector3 localCamPos = xrOrigin.transform.InverseTransformPoint(vrCamera.transform.position);
+    Quaternion localCamRot =
+        Quaternion.Inverse(xrOrigin.transform.rotation) * vrCamera.transform.rotation;
+
+    // --- Step 2: set XR Origin rotation so that camera rotation becomes target rotation ---
+    // XROriginRot * localCamRot = targetRot
+    Quaternion desiredOriginRot = target.rotation * Quaternion.Inverse(localCamRot);
+    xrOrigin.transform.rotation = desiredOriginRot;
+
+    // --- Step 3: set XR Origin position so that camera position becomes target position ---
+    // XROriginPos + (XROriginRot * localCamPos) = targetPos
+    Vector3 worldOffset = xrOrigin.transform.rotation * localCamPos;
+    xrOrigin.transform.position = target.position - worldOffset;
+
+    Debug.Log($"Camera final pos: {vrCamera.transform.position}");
+    Debug.Log($"Camera final rot: {vrCamera.transform.rotation}");
+}
+
 
     /// <summary>
     /// Teleport VR camera to a Transform target.
@@ -57,6 +66,6 @@ public class CameraManager : MonoBehaviour
             return;
         }
 
-        TeleportCamera(Target.position, Target.rotation);
+        TeleportCamera(Target);
     }
 }

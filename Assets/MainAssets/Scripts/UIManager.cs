@@ -43,7 +43,7 @@ public class UIManager : MonoBehaviour
         recordGripWidthPage.SetActive(false);
         //detectHandsPage.SetActive(false);
         enterVRModePage.SetActive(false);
-        //trainPage.SetActive(false);
+        trainPage.SetActive(false);
     }
 
     // Adjust Settings Page

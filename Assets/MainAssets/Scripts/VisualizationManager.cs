@@ -17,16 +17,21 @@ public class VisualizationManager : MonoBehaviour
 
     void Update()
     {
-
+        gripMarkers.transform.position = bar.transform.position;
+        gripMarkers.transform.rotation = bar.transform.rotation;
     }
 
     // Visualization
+    public GameObject bar;
+    public GameObject bench;
     public GameObject gripMarkers;
     public GameObject barPositionIndicators;
     public GameObject barRotationIndicators;
 
     public void HideAllVisualization()
     {
+        bar.SetActive(false);
+        bench.SetActive(false);
         gripMarkers.SetActive(false);
         barPositionIndicators.SetActive(false);
         barRotationIndicators.SetActive(false);

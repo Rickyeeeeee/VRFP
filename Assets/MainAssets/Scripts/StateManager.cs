@@ -14,12 +14,12 @@ public class StateManager : MonoBehaviour
 
     void Start()
     {
-        // ChangeStateToWelcome();
+        // ChangeStateToLieDown();
         // ChangeStateToTrain();
-        // ChangeStateToWelcome();
+        ChangeStateToWelcome();
         // ChangeStateToRecordGripWidth();
-        ChangeStateToLieDown();
-    }
+        // ChangeStateToLieDown();
+    }   
 
     void Update()
     {
@@ -119,8 +119,10 @@ public class StateManager : MonoBehaviour
             case State.RecordGripWidth:
                 UIManager.Instance.recordGripWidthPage.SetActive(true);
                 AudioManager.Instance.recordGripWidthAudioSource.Play();
+                VisualizationManager.Instance.bar.SetActive(true);
+                VisualizationManager.Instance.bench.SetActive(true);
                 checkChangeStateCoroutine = StartCoroutine(
-                    NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsOkayRickyDetected(), State.DetectHands)
+                    NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsRecordGripWidthReady(), State.DetectHands)
                 );
                 CameraManager.Instance.TeleportToTarget();
                 break;
@@ -128,9 +130,11 @@ public class StateManager : MonoBehaviour
             case State.DetectHands:
                 //UIManager.Instance.detectHandsPage.SetActive(true);
                 AudioManager.Instance.detectHandsAudioSource.Play();
+                VisualizationManager.Instance.bar.SetActive(true);
+                VisualizationManager.Instance.bench.SetActive(true);
                 VisualizationManager.Instance.gripMarkers.SetActive(true);
                 checkChangeStateCoroutine = StartCoroutine(
-                    NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsHandPositionCorrect(), State.EnterVRMode)
+                    NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsHandPositionCorrect(), State.Train)
                 );
                 break;
 
@@ -144,10 +148,11 @@ public class StateManager : MonoBehaviour
 
             case State.Train:
                 UIManager.Instance.trainPage.SetActive(true);
+                VisualizationManager.Instance.bar.SetActive(true);
+                VisualizationManager.Instance.bench.SetActive(true);
                 VisualizationManager.Instance.barPositionIndicators.SetActive(true);
                 VisualizationManager.Instance.barRotationIndicators.SetActive(true);
                 TrainCoroutineManager.Instance.StartAllTrainCoroutines();
-                CameraManager.Instance.TeleportToTarget();
                 break;
 
             default:

@@ -23,12 +23,15 @@ public class SharedInfoManager : MonoBehaviour
     // Triggers
     [SerializeField] private bool isOkayRickyDetected = false;
     [SerializeField] private bool isLying = false;
+    [SerializeField] private bool isRecordGripWidthReady = false;
     [SerializeField] private bool isHandPositionCorrect = false;
 
     public bool GetIsOkayRickyDetected() => isOkayRickyDetected;
     public void SetIsOkayRickyDetected(bool value) => isOkayRickyDetected = value;
     public bool GetIsLying() => isLying;
     public void SetIsLying(bool value) => isLying = value;
+    public bool GetIsRecordGripWidthReady() => isRecordGripWidthReady;
+    public void SetIsRecordGripWidthReady(bool value) => isRecordGripWidthReady = value;
     public bool GetIsHandPositionCorrect() => isHandPositionCorrect;
     public void SetIsHandPositionCorrect(bool value) => isHandPositionCorrect = value;
 
@@ -36,6 +39,7 @@ public class SharedInfoManager : MonoBehaviour
     {
         isOkayRickyDetected = false;
         isLying = false;
+        isRecordGripWidthReady = false;
         isHandPositionCorrect = false;
     }
 
