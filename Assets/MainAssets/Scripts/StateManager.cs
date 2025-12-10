@@ -16,9 +16,9 @@ public class StateManager : MonoBehaviour
     {
         // ChangeStateToLieDown();
         // ChangeStateToTrain();
-        ChangeStateToWelcome();
+        // ChangeStateToWelcome();
         // ChangeStateToRecordGripWidth();
-        // ChangeStateToLieDown();
+        ChangeStateToLieDown();
     }   
 
     void Update()
@@ -99,7 +99,7 @@ public class StateManager : MonoBehaviour
                 UIManager.Instance.setupDevicesPage.SetActive(true);
                 AudioManager.Instance.setupDevicesAudioSource.Play();
                 checkChangeStateCoroutine = StartCoroutine(
-                    NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsOkayRickyDetected(), State.AdjustSettings)
+                    NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsOkayRickyDetected(), State.LieDown)
                 );
                 break;
 
@@ -125,6 +125,7 @@ public class StateManager : MonoBehaviour
                     NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsRecordGripWidthReady(), State.DetectHands)
                 );
                 CameraManager.Instance.TeleportToTarget();
+                IKManager.Instance.Initialize();
                 break;
 
             case State.DetectHands:
