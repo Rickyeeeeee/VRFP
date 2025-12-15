@@ -8,8 +8,8 @@ public class TrainCoroutineManager : MonoBehaviour
 {
     public static TrainCoroutineManager Instance { get; private set; }
 
-    private static readonly Color CORRECT_COLOR = new Color(0.28f, 0.5f, 0.28f, 1f);
-    private static readonly Color WRONG_COLOR = new Color(0.5f, 0.2f, 0.2f, 1f);
+    private static readonly Color CORRECT_COLOR = new Color(0.3098039f, 0.9803922f, 0.9921569f, 1f);
+    private static readonly Color WRONG_COLOR = new Color(1f, 0.2352941f, 0.2352941f, 1f);
 
     void Awake()
     {
