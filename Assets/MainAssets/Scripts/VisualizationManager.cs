@@ -35,6 +35,7 @@ public class VisualizationManager : MonoBehaviour
         gripMarkers.SetActive(false);
         barPositionIndicators.SetActive(false);
         barRotationIndicators.SetActive(false);
+        smpl.SetActive(false);
     }
 
     // Train Couroutine 2
@@ -44,4 +45,6 @@ public class VisualizationManager : MonoBehaviour
     // Train Couroutine 3
     public GameObject leftIndicator;
     public GameObject rightIndicator;
+
+    public GameObject smpl;
 }

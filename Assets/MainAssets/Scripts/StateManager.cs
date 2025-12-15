@@ -16,9 +16,9 @@ public class StateManager : MonoBehaviour
     {
         // ChangeStateToLieDown();
         // ChangeStateToTrain();
-        // ChangeStateToWelcome();
+        ChangeStateToWelcome();
         // ChangeStateToRecordGripWidth();
-        ChangeStateToLieDown();
+        // ChangeStateToLieDown();
     }   
 
     void Update()
@@ -122,7 +122,7 @@ public class StateManager : MonoBehaviour
                 VisualizationManager.Instance.bar.SetActive(true);
                 VisualizationManager.Instance.bench.SetActive(true);
                 checkChangeStateCoroutine = StartCoroutine(
-                    NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsRecordGripWidthReady(), State.DetectHands)
+                    NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsRecordGripWidthReady(), State.Train)
                 );
                 CameraManager.Instance.TeleportToTarget();
                 IKManager.Instance.Initialize();
@@ -133,7 +133,7 @@ public class StateManager : MonoBehaviour
                 AudioManager.Instance.detectHandsAudioSource.Play();
                 VisualizationManager.Instance.bar.SetActive(true);
                 VisualizationManager.Instance.bench.SetActive(true);
-                VisualizationManager.Instance.gripMarkers.SetActive(true);
+                // VisualizationManager.Instance.gripMarkers.SetActive(true);
                 checkChangeStateCoroutine = StartCoroutine(
                     NotChangeStateUntil(() => SharedInfoManager.Instance.GetIsHandPositionCorrect(), State.Train)
                 );
@@ -151,8 +151,9 @@ public class StateManager : MonoBehaviour
                 UIManager.Instance.trainPage.SetActive(true);
                 VisualizationManager.Instance.bar.SetActive(true);
                 VisualizationManager.Instance.bench.SetActive(true);
-                VisualizationManager.Instance.barPositionIndicators.SetActive(true);
-                VisualizationManager.Instance.barRotationIndicators.SetActive(true);
+                VisualizationManager.Instance.smpl.SetActive(true);
+                // VisualizationManager.Instance.barPositionIndicators.SetActive(true);
+                // VisualizationManager.Instance.barRotationIndicators.SetActive(true);
                 TrainCoroutineManager.Instance.StartAllTrainCoroutines();
                 break;
 
