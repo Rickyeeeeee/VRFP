@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 
 public class AvatarMetricsSignalManager : MonoBehaviour
 {
+    public GameObject correctBarObj;
+    private bool isCorrectBarSet = false;
+    public GameObject leftController;
     public AvatarMetrics avatarMetrics;
     public BenchPressMetrics benchPressMetrics;
     public SharedInfoManager sharedInfoManager;
@@ -75,6 +79,11 @@ public class AvatarMetricsSignalManager : MonoBehaviour
         {
             // sharedInfoManager.SetIsHandPositionCorrect(true);
             SharedInfoManager.Instance.SetIsRecordGripWidthReady(true);
+            if (!isCorrectBarSet)
+            {
+                correctBarObj.transform.SetPositionAndRotation(leftController.transform.position, leftController.transform.rotation);
+                isCorrectBarSet = true;
+            }
         }
 
         // if (isBothHandsColliding && isPositionCorrect)
