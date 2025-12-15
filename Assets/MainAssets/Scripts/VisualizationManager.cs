@@ -35,7 +35,7 @@ public class VisualizationManager : MonoBehaviour
         gripMarkers.SetActive(false);
         // barPositionIndicators.SetActive(false);
         barRotationIndicators.SetActive(false);
-        smpl.SetActive(false);
+        // smpl.SetActive(false);
     }
 
     // Train Couroutine 2

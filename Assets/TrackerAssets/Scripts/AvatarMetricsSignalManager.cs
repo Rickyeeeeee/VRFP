@@ -7,6 +7,12 @@ using UnityEngine;
 
 public class AvatarMetricsSignalManager : MonoBehaviour
 {
+    public static AvatarMetricsSignalManager Instance { get; private set; }
+
+    void Awake()
+    {
+        Instance = this;
+    }
     public GameObject correctBarObj;
     private bool isCorrectBarSet = false;
     public GameObject leftController;
@@ -24,10 +30,12 @@ public class AvatarMetricsSignalManager : MonoBehaviour
     [SerializeField] public float torsoAngleMin;
     [SerializeField] public float torsoAngleMax;
     [SerializeField] public float requiredCollisionTime = 2.0f;
+    [SerializeField] private float requiredPositionCorrectTime = 3.0f;
     public TMP_Text isLyingText;
     public TMP_Text isHandPositionCorrectText;
     
     private float collisionTimer = 0f;
+    private float positionCorrectTimer = 0f;
     private bool isLeftHandColliding = false;
     private bool isRightHandColliding = false;
     private bool wasHandPositionCorrect = false;
@@ -69,6 +77,7 @@ public class AvatarMetricsSignalManager : MonoBehaviour
 
     private void SignalIsCorrect()
     {
+        
         isLeftHandColliding = leftHandCollider != null && leftHandCollider.isColliding;
         isRightHandColliding = rightHandCollider != null && rightHandCollider.isColliding;
 
@@ -78,17 +87,23 @@ public class AvatarMetricsSignalManager : MonoBehaviour
         // Debug.Log($"Is position correct: {isPositionCorrect}");
         if (isPositionCorrect)
         {
-            // sharedInfoManager.SetIsHandPositionCorrect(true);
-            SharedInfoManager.Instance.SetIsRecordGripWidthReady(true);
-            if (!isCorrectBarSet)
+            positionCorrectTimer += Time.deltaTime;
+            if (positionCorrectTimer >= requiredPositionCorrectTime)
             {
-                correctBarObj.transform.SetPositionAndRotation(leftController.transform.position, leftController.transform.rotation);
-                isCorrectBarSet = true;
+                SharedInfoManager.Instance.SetIsRecordGripWidthReady(true);
+                if (!isCorrectBarSet)
+                {
+                    correctBarObj.transform.SetPositionAndRotation(leftController.transform.position, leftController.transform.rotation);
+                    isCorrectBarSet = true;
+                }
+                SharedInfoManager.Instance.SetBarLowerRefPosition(leftController.transform.position);
+                SharedInfoManager.Instance.SetBarUpperRefPosition(leftController.transform.position + new UnityEngine.Vector3(0f,0.6f,0f));
+                // SharedInfoManager.Instance.SetBarCurrentRotation(leftController.transform.eulerAngles);
             }
-            SharedInfoManager.Instance.SetBarLowerRefPosition(leftController.transform.position);
-            SharedInfoManager.Instance.SetBarUpperRefPosition(leftController.transform.position + new UnityEngine.Vector3(0f,0.6f,0f));
-            SharedInfoManager.Instance.SetBarCurrentRotation(leftController.transform.eulerAngles);
-
+        }
+        else
+        {
+            positionCorrectTimer = 0f;
         }
 
         // if (isBothHandsColliding && isPositionCorrect)
