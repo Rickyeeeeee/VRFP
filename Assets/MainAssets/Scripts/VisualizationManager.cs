@@ -28,6 +28,9 @@ public class VisualizationManager : MonoBehaviour
     public GameObject barPositionIndicators;
     public GameObject barRotationIndicators;
 
+    public GameObject UIBarUp;
+    public GameObject UIBarDown;
+
     public void HideAllVisualization()
     {
         bar.SetActive(false);

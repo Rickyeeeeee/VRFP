@@ -75,8 +75,10 @@ public class UIManager : MonoBehaviour
     public GameObject leftHandPanelBackground;
     public GameObject rightHandPanelBackground;
     public GameObject overallPanelBackground;
-    public GameObject leftHandWrongImage;   
-    public GameObject leftHandCorrectImage; 
-    public GameObject rightHandWrongImage;  
-    public GameObject rightHandCorrectImage; 
+    public GameObject leftHandWrongImage;
+    public GameObject leftHandCorrectImage;
+    public GameObject rightHandWrongImage;
+    public GameObject rightHandCorrectImage;
+    public GameObject AnimatedDot;
+    public GameObject SliderBar;
 }
