@@ -15,8 +15,8 @@ public class StateManager : MonoBehaviour
     void Start()
     {
         // ChangeStateToLieDown();
-        // ChangeStateToTrain();
-        ChangeStateToWelcome();
+        ChangeStateToTrain();
+        // ChangeStateToWelcome();
         // ChangeStateToRecordGripWidth();
         // ChangeStateToLieDown();
     }   
@@ -148,13 +148,15 @@ public class StateManager : MonoBehaviour
                 break;
 
             case State.Train:
+
                 SharedInfoManager.Instance.SetBarLowerRefPosition(AvatarMetricsSignalManager.Instance.leftController.transform.position);
                 SharedInfoManager.Instance.SetBarUpperRefPosition(AvatarMetricsSignalManager.Instance.leftController.transform.position + new UnityEngine.Vector3(0f,0.6f,0f));
                 // SharedInfoManager.Instance.SetBarCurrentRotation(AvatarMetricsSignalManager.Instance.leftController.transform.eulerAngles);
+                
                 UIManager.Instance.trainPage.SetActive(true);
                 VisualizationManager.Instance.bar.SetActive(true);
                 VisualizationManager.Instance.bench.SetActive(true);
-                VisualizationManager.Instance.smpl.GetComponent<MeshRenderer>().enabled = true;
+                VisualizationManager.Instance.smpl.GetComponentInChildren<SkinnedMeshRenderer>().enabled = true;
                 // VisualizationManager.Instance.barPositionIndicators.SetActive(true);
                 // VisualizationManager.Instance.barRotationIndicators.SetActive(true);
                 TrainCoroutineManager.Instance.StartAllTrainCoroutines();

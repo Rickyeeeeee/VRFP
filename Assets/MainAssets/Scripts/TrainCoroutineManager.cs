@@ -36,6 +36,7 @@ public class TrainCoroutineManager : MonoBehaviour
 
     public void StartAllTrainCoroutines()
     {
+        Debug.Log("Fuck");
         trainCoroutine1 = StartCoroutine(TrainCoroutine1());
         trainCoroutine2 = StartCoroutine(TrainCoroutine2());
         trainCoroutine3 = StartCoroutine(TrainCoroutine3());
@@ -53,7 +54,7 @@ public class TrainCoroutineManager : MonoBehaviour
         {
             Vector3 currentPosition = SharedInfoManager.Instance.GetBarCurrentPosition();
             Vector3 currentRotation = SharedInfoManager.Instance.GetBarCurrentRotation();
-            Vector3 initialPosition = SharedInfoManager.Instance.GetBarUpperRefPosition();
+            Vector3 initialPosition = SharedInfoManager.Instance.GetBarLowerRefPosition();
             Vector3 initialRotation = SharedInfoManager.Instance.GetBarRefRotation();
 
             if (!startingZCaptured)
@@ -67,10 +68,10 @@ public class TrainCoroutineManager : MonoBehaviour
 
             float scale = 100.0f;
             Vector3 scaledpositionDifference = positionDifference * scale;
-            UIManager.Instance.bar.transform.localPosition = new Vector3(scaledpositionDifference.z, scaledpositionDifference.x, 0.0f);
+            // UIManager.Instance.bar.transform.localPosition = new Vector3(scaledpositionDifference.z, scaledpositionDifference.x, 0.0f);
             UIManager.Instance.redSpot.transform.localPosition = new Vector3(scaledpositionDifference.z, scaledpositionDifference.x, 0.0f);
 
-            UIManager.Instance.bar.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationDifference.y);
+            // UIManager.Instance.bar.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationDifference.y);
             UIManager.Instance.redSpot.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationDifference.y);
             Debug.Log("positionDifference: " + positionDifference);
             Debug.Log("rotationDifference: " + rotationDifference);

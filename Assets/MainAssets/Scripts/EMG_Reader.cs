@@ -5,6 +5,7 @@ using System.IO.Ports;
 using System.Threading;
 
 using System;
+using UnityEngine.UI;
 
 public class EMG_Reader : MonoBehaviour
 {
@@ -16,15 +17,17 @@ public class EMG_Reader : MonoBehaviour
     private volatile bool keepReading = false;
 
     //Optional, cube vis
-    public Transform testCube;
+    // public GameObject chest;
 
     // smoothing, can use other method
     private float displayedValue = 0f;
 
     void Start()
-    {
-        OpenPort();
-    }
+{
+    DontDestroyOnLoad(gameObject);  // Prevent destruction on scene changes
+    Debug.Log("[EMG] Start() called - keeping GameObject alive");
+    OpenPort();
+}
 
     void OpenPort()
     {
@@ -67,6 +70,7 @@ public class EMG_Reader : MonoBehaviour
             catch (TimeoutException)
             {
                 // Ignore timeout exceptions
+                Debug.Log("Timeout");
             }
 
             catch (System.Exception e)
@@ -82,13 +86,14 @@ public class EMG_Reader : MonoBehaviour
     void Update()
     {
         // 1. 先一樣做平滑（避免顏色抖來抖去）
+        Debug.Log("UpdatingＥＭＧ");
         displayedValue = Mathf.Lerp(displayedValue, emgValue, 0.15f);
 
-        if (testCube != null)
-        {
+        // if (chest != null)
+        // {
             // 2. 把 displayedValue 正規化成 0~1
             //    把 maxEmg 改小一點，讓變化更敏感
-            float maxEmg = 400f;  // 先試 120，如果還是不夠敏感再往下調 80、100 都可以
+            float maxEmg = 300f;  // 先試 120，如果還是不夠敏感再往下調 80、100 都可以
             float t = displayedValue / maxEmg;
             t = Mathf.Clamp01(t);   // 限制在 0~1 之間
 
@@ -101,18 +106,20 @@ public class EMG_Reader : MonoBehaviour
             // 4. 可以給一點底亮度，看起來比較不死
             float minIntensity = 0.15f;             // 放鬆時的暗紅程度
             float intensity = Mathf.Lerp(minIntensity, 1.0f, t);
+            SharedInfoManager.Instance.SetEMGSignal(intensity);
+            // // Color c = new Color(intensity, 0f, 0f);
 
-            Color c = new Color(intensity, 0f, 0f);
-
-            var renderer = testCube.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                renderer.material.color = c;
-            }
-        }
+            // RawImage musle = chest.GetComponent<RawImage>();
+            // Color color_a = musle.color;
+            // if (color_a != null)
+            // {
+            //     color_a.a = intensity;
+            //     // print(Color.a);
+            // }
+        // }
 
         // 暫時開一下看數值範圍，之後覺得 OK 就關掉
-        // Debug.Log($"EMG raw: {emgValue:F2}  disp: {displayedValue:F2}");
+        Debug.Log($"EMG raw: {emgValue:F2}  disp: {displayedValue:F2}");
     }
 
 
@@ -123,10 +130,11 @@ public class EMG_Reader : MonoBehaviour
     }
 
     void OnDisable()
-    {
-        ClosePort();
-    }
-
+{
+    Debug.Log($"[EMG] OnDisable called! GameObject active: {gameObject.activeInHierarchy}");
+    Debug.LogError(System.Environment.StackTrace); // Show what called this
+    ClosePort();
+}
     void ClosePort()
     {
         keepReading = false;

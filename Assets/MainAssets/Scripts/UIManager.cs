@@ -62,7 +62,7 @@ public class UIManager : MonoBehaviour
     }
 
     // Train Couroutine 1
-    public GameObject bar;
+    // public GameObject bar;
     public GameObject redSpot;
 
     // Train Couroutine 2

@@ -18,6 +18,7 @@ public class SharedInfoManager : MonoBehaviour
 
     void Update()
     {
+        barCurrentPosition = GetBarCurrentPosition();
     }
 
     // Triggers
@@ -45,9 +46,10 @@ public class SharedInfoManager : MonoBehaviour
 
     // Train Couroutine 1, 2, 3
     public GameObject bar;
-    private Vector3 barUpperRefPosition;
-    private Vector3 barLowerRefPosition;
-    private Vector3 barRefRotation;
+    [SerializeField] private Vector3 barCurrentPosition;
+    [SerializeField] private Vector3 barUpperRefPosition;
+    [SerializeField] private Vector3 barLowerRefPosition;
+    [SerializeField] private Vector3 barRefRotation;
 
     public Vector3 GetBarCurrentPosition() => bar.transform.position;
     public void SetBarCurrentPosition(Vector3 value) => bar.transform.position = value;
