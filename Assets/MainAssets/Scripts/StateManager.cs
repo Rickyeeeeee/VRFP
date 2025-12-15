@@ -15,8 +15,8 @@ public class StateManager : MonoBehaviour
     void Start()
     {
         // ChangeStateToLieDown();
-        ChangeStateToTrain();
-        // ChangeStateToWelcome();
+        // ChangeStateToTrain();
+        ChangeStateToWelcome();
         // ChangeStateToRecordGripWidth();
         // ChangeStateToLieDown();
     }   

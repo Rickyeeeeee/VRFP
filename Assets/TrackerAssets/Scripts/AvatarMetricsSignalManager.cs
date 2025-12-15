@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
@@ -84,6 +85,10 @@ public class AvatarMetricsSignalManager : MonoBehaviour
                 correctBarObj.transform.SetPositionAndRotation(leftController.transform.position, leftController.transform.rotation);
                 isCorrectBarSet = true;
             }
+            SharedInfoManager.Instance.SetBarLowerRefPosition(leftController.transform.position);
+            SharedInfoManager.Instance.SetBarUpperRefPosition(leftController.transform.position + new UnityEngine.Vector3(0f,0.6f,0f));
+            SharedInfoManager.Instance.SetBarCurrentRotation(leftController.transform.eulerAngles);
+
         }
 
         // if (isBothHandsColliding && isPositionCorrect)

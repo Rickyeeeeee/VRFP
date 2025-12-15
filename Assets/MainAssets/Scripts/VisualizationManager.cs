@@ -33,7 +33,7 @@ public class VisualizationManager : MonoBehaviour
         bar.SetActive(false);
         bench.SetActive(false);
         gripMarkers.SetActive(false);
-        barPositionIndicators.SetActive(false);
+        // barPositionIndicators.SetActive(false);
         barRotationIndicators.SetActive(false);
         smpl.SetActive(false);
     }

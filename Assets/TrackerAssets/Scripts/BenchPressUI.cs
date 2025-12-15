@@ -31,22 +31,22 @@ public class BenchPressUI : MonoBehaviour
         if (Metrics != null)
         {
             if (ForearmLeftText != null)
-                ForearmLeftText.text      = $"Forearm L: {Metrics.ForearmAngleLeft:F1}°";
+                ForearmLeftText.text      = $"{Metrics.ForearmAngleLeft:F1}°";
 
             if (UpperArmLeftText != null)
-                UpperArmLeftText.text     = $"UpperArm L: {Metrics.UpperArmBodyAngleLeft:F1}°";
+                UpperArmLeftText.text     = $"{Metrics.UpperArmBodyAngleLeft:F1}°";
 
             if (ElbowHeightLeftText != null)
-                ElbowHeightLeftText.text  = $"ElbowHeight L: {Metrics.ElbowHeightLeft:F2} m";
+                ElbowHeightLeftText.text  = $"{Metrics.ElbowHeightLeft:F2} m";
 
             if (ForearmRightText != null)
-                ForearmRightText.text     = $"Forearm R: {Metrics.ForearmAngleRight:F1}°";
+                ForearmRightText.text     = $"{Metrics.ForearmAngleRight:F1}°";
 
             if (UpperArmRightText != null)
-                UpperArmRightText.text    = $"UpperArm R: {Metrics.UpperArmBodyAngleRight:F1}°";
+                UpperArmRightText.text    = $"{Metrics.UpperArmBodyAngleRight:F1}°";
 
             if (ElbowHeightRightText != null)
-                ElbowHeightRightText.text = $"ElbowHeight R: {Metrics.ElbowHeightRight:F2} m";
+                ElbowHeightRightText.text = $"{Metrics.ElbowHeightRight:F2} m";
         }
 
         // -----------------------

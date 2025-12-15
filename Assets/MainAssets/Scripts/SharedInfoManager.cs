@@ -3,12 +3,12 @@ using UnityEngine;
 public class SharedInfoManager : MonoBehaviour
 {
     public static SharedInfoManager Instance { get; private set; }
-
+    
     void Awake()
     {
         Instance = this;
     }
-
+    
     void Start()
     {
         barUpperRefPosition = new Vector3(0.0f, 1.26f, 0.5f) + new Vector3(0.0f, 0.15f, 0.0f);
