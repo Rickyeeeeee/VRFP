@@ -133,6 +133,31 @@ public class TrainCoroutineManager : MonoBehaviour
             Vector3 currentPosition = SharedInfoManager.Instance.GetBarCurrentPosition();
             Vector3 objectivePosition = isGoingDown ? SharedInfoManager.Instance.GetBarLowerRefPosition() : SharedInfoManager.Instance.GetBarUpperRefPosition();
 
+            // Get reference positions for slider calculation
+            Vector3 upperRefPosition = SharedInfoManager.Instance.GetBarUpperRefPosition();
+            Vector3 lowerRefPosition = SharedInfoManager.Instance.GetBarLowerRefPosition();
+            
+            // Calculate progress between upper and lower positions
+            float totalDistance = upperRefPosition.y - lowerRefPosition.y;
+            float currentProgress = 0f;
+            
+            if (totalDistance != 0f)
+            {
+                currentProgress = (currentPosition.y - lowerRefPosition.y) / totalDistance;
+                currentProgress = Mathf.Clamp01(currentProgress); // Clamp between 0 and 1
+            }
+            
+            // Update slider position based on current progress
+            if (UIManager.Instance.SliderBar != null)
+            {
+                Vector3 upperUIPosition = VisualizationManager.Instance.UIBarUp.transform.position;
+                Vector3 lowerUIPosition = VisualizationManager.Instance.UIBarDown.transform.position;
+                
+                // Lerp between lower and upper UI positions based on progress
+                Vector3 sliderPosition = Vector3.Lerp(lowerUIPosition, upperUIPosition, currentProgress);
+                UIManager.Instance.SliderBar.transform.position = sliderPosition;
+            }
+
             bool isSatisfied = isGoingDown && currentPosition.y <= objectivePosition.y || !isGoingDown && currentPosition.y >= objectivePosition.y;
 
             if (isSatisfied)
@@ -153,11 +178,13 @@ public class TrainCoroutineManager : MonoBehaviour
                 {
                     VisualizationManager.Instance.upperIndicator.SetActive(false);
                     VisualizationManager.Instance.lowerIndicator.SetActive(true);
+                    UIManager.Instance.AnimatedDot.transform.position = VisualizationManager.Instance.UIBarDown.transform.position;
                 }
                 else
                 {
                     VisualizationManager.Instance.upperIndicator.SetActive(true);
                     VisualizationManager.Instance.lowerIndicator.SetActive(false);
+                    UIManager.Instance.AnimatedDot.transform.position = VisualizationManager.Instance.UIBarUp.transform.position;
                 }
             }
 
