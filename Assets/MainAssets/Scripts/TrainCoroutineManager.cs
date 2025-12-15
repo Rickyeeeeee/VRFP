@@ -157,6 +157,10 @@ public class TrainCoroutineManager : MonoBehaviour
                 // Lerp between lower and upper UI positions based on progress
                 Vector3 sliderPosition = Vector3.Lerp(lowerUIPosition, upperUIPosition, currentProgress);
                 UIManager.Instance.SliderBar.transform.position = sliderPosition;
+            //     if (!EMG_Reader.IsHardwareAvailable)
+            // {
+                SharedInfoManager.Instance.SetEMGSignal(currentProgress);
+            // }
             }
 
             bool isSatisfied = isGoingDown && currentPosition.y <= objectivePosition.y || !isGoingDown && currentPosition.y >= objectivePosition.y;

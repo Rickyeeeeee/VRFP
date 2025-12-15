@@ -27,6 +27,7 @@ public class AudioManager : MonoBehaviour
     public AudioSource recordGripWidthAudioSource;
     public AudioSource detectHandsAudioSource;
     public AudioSource enterVRModeAudioSource;
+    public AudioSource trainAudioSource;
 
     public void StopAllInstructions()
     {
@@ -37,5 +38,6 @@ public class AudioManager : MonoBehaviour
         recordGripWidthAudioSource.Stop();
         detectHandsAudioSource.Stop();
         enterVRModeAudioSource.Stop();
+        trainAudioSource.Stop();
     }
 }

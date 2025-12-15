@@ -97,7 +97,7 @@ public class AvatarMetricsSignalManager : MonoBehaviour
                     isCorrectBarSet = true;
                 }
                 SharedInfoManager.Instance.SetBarLowerRefPosition(leftController.transform.position);
-                SharedInfoManager.Instance.SetBarUpperRefPosition(leftController.transform.position + new UnityEngine.Vector3(0f,0.6f,0f));
+                SharedInfoManager.Instance.SetBarUpperRefPosition(leftController.transform.position + new UnityEngine.Vector3(0f,0.15f,0f));
                 // SharedInfoManager.Instance.SetBarCurrentRotation(leftController.transform.eulerAngles);
             }
         }

@@ -15,8 +15,8 @@ public class StateManager : MonoBehaviour
     void Start()
     {
         // ChangeStateToLieDown();
-        ChangeStateToTrain();
-        //ChangeStateToWelcome();
+        // ChangeStateToTrain();
+        ChangeStateToWelcome();
         // ChangeStateToRecordGripWidth();
         // ChangeStateToLieDown();
     }   
@@ -148,9 +148,12 @@ public class StateManager : MonoBehaviour
                 break;
 
             case State.Train:
+                AudioManager.Instance.trainAudioSource.Play();
+                SceneManager.Instance.scene1.SetActive(false);
+                SceneManager.Instance.scene2.SetActive(true);
 
                 SharedInfoManager.Instance.SetBarLowerRefPosition(AvatarMetricsSignalManager.Instance.leftController.transform.position);
-                SharedInfoManager.Instance.SetBarUpperRefPosition(AvatarMetricsSignalManager.Instance.leftController.transform.position + new UnityEngine.Vector3(0f,0.6f,0f));
+                SharedInfoManager.Instance.SetBarUpperRefPosition(AvatarMetricsSignalManager.Instance.leftController.transform.position + new UnityEngine.Vector3(0f,0.15f,0f));
                 // SharedInfoManager.Instance.SetBarCurrentRotation(AvatarMetricsSignalManager.Instance.leftController.transform.eulerAngles);
                 
                 UIManager.Instance.trainPage.SetActive(true);

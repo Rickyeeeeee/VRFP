@@ -16,6 +16,7 @@ public class EMG_Reader : MonoBehaviour
     private Thread readThread;
     private volatile bool keepReading = false;
 
+    public static bool IsHardwareAvailable { get; private set; } = false;
     //Optional, cube vis
     // public GameObject chest;
 
